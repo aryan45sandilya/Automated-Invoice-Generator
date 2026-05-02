@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Invoice Management System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-speedometer2"></i> Dashboard</h2>
+    <div>
+        <a href="{{ url_for('invoices.create') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> New Invoice
+        </a>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row">
+    <div class="col-md-3">
+        <div class="stat-card primary">
+            <h6 class="mb-2">Total Revenue</h6>
+            <h2 class="mb-0">₹{{ "%.2f"|format(total_revenue) }}</h2>
+            <small><i class="bi bi-check-circle"></i> {{ paid_count }} paid invoices</small>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="stat-card warning">
+            <h6 class="mb-2">Pending Amount</h6>
+            <h2 class="mb-0">₹{{ "%.2f"|format(pending_amount) }}</h2>
+            <small><i class="bi bi-clock"></i> {{ pending_count }} pending</small>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="stat-card danger">
+            <h6 class="mb-2">Overdue Amount</h6>
+            <h2 class="mb-0">₹{{ "%.2f"|format(overdue_amount) }}</h2>
+            <small><i class="bi bi-exclamation-triangle"></i> {{ overdue_count }} overdue</small>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="stat-card success">
+            <h6 class="mb-2">Total Clients</h6>
+            <h2 class="mb-0">{{ total_clients }}</h2>
+            <small><i class="bi bi-people"></i> Active clients</small>
+        </div>
+    </div>
+</div>
+
+<!-- Charts and Tables Row -->
+<div class="row mt-4">
+    <!-- Monthly Revenue Chart -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Monthly Revenue</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="revenueChart" height="80"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top Clients -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-star"></i> Top Clients</h5>
+            </div>
+            <div class="card-body">
+                {% if top_clients %}
+                    <div class="list-group list-group-flush">
+                        {% for client in top_clients %}
+                        <div class="list-group-item px-0">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ client.name }}</strong><br>
+                                    <small class="text-muted">{{ client.invoice_count }} invoices</small>
+                                </div>
+                                <span class="badge bg-success">?{{ "%.2f"|format(client.total_revenue) }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center">No data available</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Invoices -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-file-earmark-text"></i> Recent Invoices</h5>
+                <a href="{{ url_for('invoices.list') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body">
+                {% if recent_invoices %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Invoice #</th>
+                                <th>Client</th>
+                                <th>Date</th>
+                                <th>Due Date</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for invoice in recent_invoices %}
+                            <tr>
+                                <td><strong>{{ invoice.invoice_number }}</strong></td>
+                                <td>{{ invoice.client.name }}</td>
+                                <td>{{ invoice.date.strftime('%b %d, %Y') }}</td>
+                                <td>{{ invoice.due_date.strftime('%b %d, %Y') }}</td>
+                                <td>?{{ "%.2f"|format(invoice.total_amount) }}</td>
+                                <td>
+                                    {% if invoice.status == 'Paid' %}
+                                        <span class="badge bg-success">Paid</span>
+                                    {% elif invoice.status == 'Pending' %}
+                                        <span class="badge bg-warning">Pending</span>
+                                    {% elif invoice.status == 'Overdue' %}
+                                        <span class="badge bg-danger">Overdue</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ invoice.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('invoices.view', invoice_id=invoice.id) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-center text-muted">No invoices yet. <a href="{{ url_for('invoices.create') }}">Create your first invoice</a></p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    // Monthly Revenue Chart
+    const ctx = document.getElementById('revenueChart');
+    const monthlyData = {{ monthly_data | tojson }};
+    
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: monthlyData.map(d => d.month),
+            datasets: [{
+                label: 'Revenue',
+                data: monthlyData.map(d => d.revenue),
+                backgroundColor: 'rgba(52, 152, 219, 0.8)',
+                borderColor: 'rgba(52, 152, 219, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '?' + value.toFixed(2);
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

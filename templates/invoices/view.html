@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block title %}Invoice {{ invoice.invoice_number }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-file-earmark-text"></i> Invoice {{ invoice.invoice_number }}</h2>
+    <div>
+        <a href="{{ url_for('invoices.edit', invoice_id=invoice.id) }}" class="btn btn-secondary">
+            <i class="bi bi-pencil"></i> Edit
+        </a>
+        <a href="{{ url_for('invoices.download_pdf', invoice_id=invoice.id) }}" class="btn btn-info">
+            <i class="bi bi-download"></i> Download PDF
+        </a>
+        <button type="button" class="btn btn-primary" onclick="sendEmail()">
+            <i class="bi bi-envelope"></i> Send Email
+        </button>
+    </div>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5>{{ company_name }}</h5>
+                        <p class="text-muted mb-0">Invoice Management System</p>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <h3>INVOICE</h3>
+                        <p class="mb-0"><strong>{{ invoice.invoice_number }}</strong></p>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6>Bill To:</h6>
+                        <p class="mb-0"><strong>{{ invoice.client.name }}</strong></p>
+                        {% if invoice.client.company %}
+                        <p class="mb-0">{{ invoice.client.company }}</p>
+                        {% endif %}
+                        <p class="mb-0">{{ invoice.client.email }}</p>
+                        {% if invoice.client.phone %}
+                        <p class="mb-0">{{ invoice.client.phone }}</p>
+                        {% endif %}
+                        {% if invoice.client.address %}
+                        <p class="mb-0">{{ invoice.client.address }}</p>
+                        {% endif %}
+                        {% if invoice.client.gstin %}
+                        <p class="mb-0">GSTIN: {{ invoice.client.gstin }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <p><strong>Invoice Date:</strong> {{ invoice.date.strftime('%B %d, %Y') }}</p>
+                        <p><strong>Due Date:</strong> {{ invoice.due_date.strftime('%B %d, %Y') }}</p>
+                        <p>
+                            <strong>Status:</strong> 
+                            {% if invoice.status == 'Paid' %}
+                                <span class="badge bg-success">Paid</span>
+                            {% elif invoice.status == 'Pending' %}
+                                <span class="badge bg-warning">Pending</span>
+                            {% elif invoice.status == 'Overdue' %}
+                                <span class="badge bg-danger">Overdue</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ invoice.status }}</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="table-responsive mb-4">
+                    <table class="table table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Description</th>
+                                <th class="text-center">Quantity</th>
+                                <th class="text-end">Price</th>
+                                <th class="text-end">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in invoice.items %}
+                            <tr>
+                                <td>{{ item.description }}</td>
+                                <td class="text-center">{{ item.quantity }}</td>
+                                <td class="text-end">?{{ "%.2f"|format(item.price) }}</td>
+                                <td class="text-end">?{{ "%.2f"|format(item.total) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>Subtotal:</strong></td>
+                                <td class="text-end">?{{ "%.2f"|format(invoice.subtotal) }}</td>
+                            </tr>
+                            {% if invoice.tax_rate > 0 %}
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>Tax ({{ invoice.tax_rate }}%):</strong></td>
+                                <td class="text-end">?{{ "%.2f"|format(invoice.tax_amount) }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if invoice.discount > 0 %}
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>Discount:</strong></td>
+                                <td class="text-end">-?{{ "%.2f"|format(invoice.discount) }}</td>
+                            </tr>
+                            {% endif %}
+                            <tr class="table-active">
+                                <td colspan="3" class="text-end"><strong>Total Amount:</strong></td>
+                                <td class="text-end"><strong>?{{ "%.2f"|format(invoice.total_amount) }}</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                {% if invoice.notes %}
+                <div class="mb-3">
+                    <h6>Notes:</h6>
+                    <p class="text-muted">{{ invoice.notes }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-outline-success" onclick="updateStatus('Paid')">
+                        <i class="bi bi-check-circle"></i> Mark as Paid
+                    </button>
+                    <button type="button" class="btn btn-outline-warning" onclick="updateStatus('Pending')">
+                        <i class="bi bi-clock"></i> Mark as Pending
+                    </button>
+                    <button type="button" class="btn btn-outline-danger" onclick="updateStatus('Overdue')">
+                        <i class="bi bi-exclamation-circle"></i> Mark as Overdue
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="updateStatus('Cancelled')">
+                        <i class="bi bi-x-circle"></i> Mark as Cancelled
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Invoice Details</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Created:</strong><br>{{ invoice.created_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                <p><strong>Client:</strong><br>
+                    <a href="{{ url_for('clients.view', client_id=invoice.client.id) }}">
+                        {{ invoice.client.name }}
+                    </a>
+                </p>
+                <p><strong>Total Items:</strong><br>{{ invoice.items.count() }}</p>
+                <p><strong>Payment Status:</strong><br>
+                    {% if invoice.status == 'Paid' %}
+                        <span class="badge bg-success">Paid</span>
+                    {% elif invoice.status == 'Pending' %}
+                        <span class="badge bg-warning">Pending</span>
+                    {% elif invoice.status == 'Overdue' %}
+                        <span class="badge bg-danger">Overdue</span>
+                    {% else %}
+                        <span class="badge bg-secondary">{{ invoice.status }}</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function updateStatus(status) {
+    if (confirm(`Are you sure you want to mark this invoice as ${status}?`)) {
+        fetch(`/invoices/{{ invoice.id }}/status`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status: status })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message || 'Failed to update status');
+            }
+        })
+        .catch(error => {
+            alert('Error updating status: ' + error);
+        });
+    }
+}
+
+function sendEmail() {
+    if (confirm('Send this invoice to {{ invoice.client.email }}?')) {
+        fetch(`/invoices/{{ invoice.id }}/email`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Invoice sent successfully!');
+            } else {
+                alert(data.message || 'Failed to send invoice');
+            }
+        })
+        .catch(error => {
+            alert('Error sending invoice: ' + error);
+        });
+    }
+}
+</script>
+{% endblock %}

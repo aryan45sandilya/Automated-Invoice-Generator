@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Edit Client' if client else 'Add New Client' }}{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h2>
+        <i class="bi bi-person-plus"></i> 
+        {{ 'Edit Client' if client else 'Add New Client' }}
+    </h2>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('clients.edit', client_id=client.id) if client else url_for('clients.create') }}">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" 
+                                   value="{{ client.name if client else '' }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="email" name="email" 
+                                   value="{{ client.email if client else '' }}" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="phone" class="form-label">Phone</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" 
+                                   value="{{ client.phone if client else '' }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="company" class="form-label">Company</label>
+                            <input type="text" class="form-control" id="company" name="company" 
+                                   value="{{ client.company if client else '' }}">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Address</label>
+                        <textarea class="form-control" id="address" name="address" rows="3">{{ client.address if client else '' }}</textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="gstin" class="form-label">GSTIN / Tax ID</label>
+                            <input type="text" class="form-control" id="gstin" name="gstin" 
+                                   value="{{ client.gstin if client else '' }}">
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('clients.list') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> {{ 'Update Client' if client else 'Create Client' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Tips</h5>
+                <ul class="small">
+                    <li>Fields marked with <span class="text-danger">*</span> are required</li>
+                    <li>Email will be used to send invoices</li>
+                    <li>GSTIN is required for GST invoices</li>
+                    <li>Complete address helps in generating professional invoices</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

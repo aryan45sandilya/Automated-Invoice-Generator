@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - Company Configuration{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-gear"></i> Company Settings</h2>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-building"></i> Company Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('settings.update') }}">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="company_name" class="form-label">
+                                <i class="bi bi-building"></i> Company Name <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="company_name" name="company_name" 
+                                   value="{{ settings.company_name }}" required>
+                            <small class="text-muted">This will appear on invoices and PDFs</small>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="company_email" class="form-label">
+                                <i class="bi bi-envelope"></i> Company Email <span class="text-danger">*</span>
+                            </label>
+                            <input type="email" class="form-control" id="company_email" name="company_email" 
+                                   value="{{ settings.company_email }}" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="company_phone" class="form-label">
+                                <i class="bi bi-telephone"></i> Company Phone
+                            </label>
+                            <input type="text" class="form-control" id="company_phone" name="company_phone" 
+                                   value="{{ settings.company_phone }}" placeholder="+91-XXXXX-XXXXX">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="invoice_prefix" class="form-label">
+                                <i class="bi bi-hash"></i> Invoice Prefix
+                            </label>
+                            <input type="text" class="form-control" id="invoice_prefix" name="invoice_prefix" 
+                                   value="{{ settings.invoice_prefix }}" placeholder="INV">
+                            <small class="text-muted">Example: INV-2026-000001</small>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="company_address" class="form-label">
+                            <i class="bi bi-geo-alt"></i> Company Address
+                        </label>
+                        <textarea class="form-control" id="company_address" name="company_address" 
+                                  rows="3">{{ settings.company_address }}</textarea>
+                        <small class="text-muted">Full address with city, state, and PIN code</small>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <h5 class="mb-3"><i class="bi bi-currency-rupee"></i> Currency & Tax Settings</h5>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="currency_symbol" class="form-label">
+                                <i class="bi bi-currency-exchange"></i> Currency Symbol
+                            </label>
+                            <input type="text" class="form-control" id="currency_symbol" name="currency_symbol" 
+                                   value="{{ settings.currency_symbol }}" placeholder="₹">
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="currency_code" class="form-label">
+                                <i class="bi bi-cash"></i> Currency Code
+                            </label>
+                            <input type="text" class="form-control" id="currency_code" name="currency_code" 
+                                   value="{{ settings.currency_code }}" placeholder="INR">
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="default_tax_rate" class="form-label">
+                                <i class="bi bi-percent"></i> Default Tax Rate (%)
+                            </label>
+                            <input type="number" class="form-control" id="default_tax_rate" name="default_tax_rate" 
+                                   value="{{ settings.default_tax_rate }}" step="0.01" min="0" max="100">
+                            <small class="text-muted">GST rate (e.g., 18)</small>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ url_for('dashboard.index') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Save Settings
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-info-circle"></i> Quick Tips</h5>
+            </div>
+            <div class="card-body">
+                <h6><i class="bi bi-lightbulb text-warning"></i> Company Name</h6>
+                <p class="small">This will appear on all invoices, PDFs, and emails sent to clients.</p>
+
+                <h6><i class="bi bi-lightbulb text-warning"></i> Currency</h6>
+                <p class="small">
+                    <strong>₹</strong> - Indian Rupee (INR)<br>
+                    <strong>$</strong> - US Dollar (USD)<br>
+                    <strong>€</strong> - Euro (EUR)<br>
+                    <strong>£</strong> - British Pound (GBP)
+                </p>
+
+                <h6><i class="bi bi-lightbulb text-warning"></i> Tax Rate</h6>
+                <p class="small">
+                    India GST Rates:<br>
+                    • 5% - Essential goods<br>
+                    • 12% - Standard goods<br>
+                    • 18% - Most services<br>
+                    • 28% - Luxury items
+                </p>
+
+                <h6><i class="bi bi-lightbulb text-warning"></i> Invoice Prefix</h6>
+                <p class="small">Customize your invoice numbering. Example: "INV" creates INV-2026-000001</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Important</h5>
+            </div>
+            <div class="card-body">
+                <p class="small mb-0">
+                    <strong>Note:</strong> After saving settings, please restart the application for all changes to take full effect.
+                </p>
+                <hr>
+                <p class="small mb-0">
+                    <strong>Restart Command:</strong><br>
+                    Stop the server (Ctrl+C) and run:<br>
+                    <code>python app.py</code>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card-header h5 {
+    color: white;
+    margin: 0;
+}
+
+.form-label i {
+    margin-right: 5px;
+    color: var(--primary-color);
+}
+
+.small {
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+code {
+    background: #f8f9fa;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #e83e8c;
+}
+</style>
+{% endblock %}

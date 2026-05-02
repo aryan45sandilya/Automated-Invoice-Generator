@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Invoices{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-file-earmark-text"></i> Invoices</h2>
+    <a href="{{ url_for('invoices.create') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Create New Invoice
+    </a>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<div class="card">
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <input type="text" id="searchInput" class="form-control" placeholder="Search invoices...">
+            </div>
+            <div class="col-md-3">
+                <select id="statusFilter" class="form-select">
+                    <option value="">All Status</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Paid">Paid</option>
+                    <option value="Overdue">Overdue</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+            </div>
+        </div>
+
+        {% if invoices %}
+        <div class="table-responsive">
+            <table class="table table-hover" id="invoicesTable">
+                <thead>
+                    <tr>
+                        <th>Invoice #</th>
+                        <th>Client</th>
+                        <th>Date</th>
+                        <th>Due Date</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for invoice in invoices %}
+                    <tr data-status="{{ invoice.status }}">
+                        <td>
+                            <a href="{{ url_for('invoices.view', invoice_id=invoice.id) }}" class="text-decoration-none">
+                                {{ invoice.invoice_number }}
+                            </a>
+                        </td>
+                        <td>{{ invoice.client.name }}</td>
+                        <td>{{ invoice.date.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ invoice.due_date.strftime('%Y-%m-%d') }}</td>
+                        <td>?{{ "%.2f"|format(invoice.total_amount) }}</td>
+                        <td>
+                            {% if invoice.status == 'Paid' %}
+                                <span class="badge bg-success">Paid</span>
+                            {% elif invoice.status == 'Pending' %}
+                                <span class="badge bg-warning">Pending</span>
+                            {% elif invoice.status == 'Overdue' %}
+                                <span class="badge bg-danger">Overdue</span>
+                            {% elif invoice.status == 'Cancelled' %}
+                                <span class="badge bg-secondary">Cancelled</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ url_for('invoices.view', invoice_id=invoice.id) }}" 
+                                   class="btn btn-outline-primary" title="View">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{{ url_for('invoices.edit', invoice_id=invoice.id) }}" 
+                                   class="btn btn-outline-secondary" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="{{ url_for('invoices.download_pdf', invoice_id=invoice.id) }}" 
+                                   class="btn btn-outline-info" title="Download PDF">
+                                    <i class="bi bi-download"></i>
+                                </a>
+                                <button type="button" class="btn btn-outline-danger" 
+                                        onclick="deleteInvoice({{ invoice.id }}, '{{ invoice.invoice_number }}')" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-file-earmark-text display-1 text-muted"></i>
+            <p class="mt-3 text-muted">No invoices found. Create your first invoice!</p>
+            <a href="{{ url_for('invoices.create') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Create First Invoice
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// Search functionality
+document.getElementById('searchInput').addEventListener('keyup', filterTable);
+document.getElementById('statusFilter').addEventListener('change', filterTable);
+
+function filterTable() {
+    const searchValue = document.getElementById('searchInput').value.toLowerCase();
+    const statusValue = document.getElementById('statusFilter').value;
+    const table = document.getElementById('invoicesTable');
+    const rows = table.getElementsByTagName('tr');
+    
+    for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        const text = row.textContent.toLowerCase();
+        const status = row.getAttribute('data-status');
+        
+        const matchesSearch = text.includes(searchValue);
+        const matchesStatus = !statusValue || status === statusValue;
+        
+        row.style.display = (matchesSearch && matchesStatus) ? '' : 'none';
+    }
+}
+
+// Delete invoice
+function deleteInvoice(invoiceId, invoiceNumber) {
+    if (confirm(`Are you sure you want to delete invoice ${invoiceNumber}? This action cannot be undone.`)) {
+        fetch(`/invoices/${invoiceId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message || 'Failed to delete invoice');
+            }
+        })
+        .catch(error => {
+            alert('Error deleting invoice: ' + error);
+        });
+    }
+}
+</script>
+{% endblock %}
