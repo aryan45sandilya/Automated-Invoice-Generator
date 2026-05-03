@@ -90,3 +90,9 @@ if __name__ == '__main__':
     
     # Run the application
     app.run(host='0.0.0.0', port=5000, debug=True)
+else:
+    # For production (Gunicorn)
+    app = create_app('production')
+    with app.app_context():
+        db.create_all()
+        print("Production database initialized!")
