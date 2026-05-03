@@ -495,15 +495,18 @@ textarea.form-control {
 .table-responsive {
     background: var(--bg-card);
     border-radius: 12px;
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: visible;
     box-shadow: var(--shadow);
     margin-bottom: 1.5rem;
     border: 1px solid var(--border);
+    -webkit-overflow-scrolling: touch;
 }
 
 .table {
     width: 100%;
     border-collapse: collapse;
+    min-width: 600px;
 }
 
 .table thead {
@@ -683,10 +686,10 @@ textarea.form-control {
         box-shadow: var(--shadow-xl);
     }
     
-    .main-content {
+    body .main-content {
         margin-left: 0;
         padding: 1rem;
-        padding-top: 80px !important;
+        padding-top: 80px;
     }
     
     .mobile-header {
@@ -798,9 +801,9 @@ textarea.form-control {
         font-size: 14px;
     }
     
-    .main-content {
+    body .main-content {
         padding: 0.875rem;
-        padding-top: 72px !important;
+        padding-top: 72px;
     }
     
     .mobile-header {

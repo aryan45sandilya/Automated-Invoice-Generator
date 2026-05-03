@@ -63,7 +63,7 @@
                         <td>{{ invoice.client.name }}</td>
                         <td>{{ invoice.date.strftime('%Y-%m-%d') }}</td>
                         <td>{{ invoice.due_date.strftime('%Y-%m-%d') }}</td>
-                        <td>?{{ "%.2f"|format(invoice.total_amount) }}</td>
+                        <td>₹{{ "%.2f"|format(invoice.total_amount) }}</td>
                         <td>
                             {% if invoice.status == 'Paid' %}
                                 <span class="badge bg-success">Paid</span>

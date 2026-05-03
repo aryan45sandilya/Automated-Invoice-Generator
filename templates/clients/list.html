@@ -55,7 +55,7 @@
                         <td>{{ client.phone or '-' }}</td>
                         <td>{{ client.company or '-' }}</td>
                         <td>{{ client.invoices.count() }}</td>
-                        <td>?{{ "%.2f"|format(client.total_revenue or 0) }}</td>
+                        <td>₹{{ "%.2f"|format(client.total_revenue or 0) }}</td>
                         <td>
                             <div class="btn-group btn-group-sm">
                                 <a href="{{ url_for('clients.view', client_id=client.id) }}" 
