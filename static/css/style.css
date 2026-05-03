@@ -797,9 +797,34 @@ textarea.form-control {
         margin-top: 1rem;
     }
     
+    .page-header .d-flex {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 1rem !important;
+    }
+    
+    .page-header .btn {
+        width: 100% !important;
+    }
+    
     .btn {
         width: 100%;
         justify-content: center;
+        margin-bottom: 0.75rem !important;
+    }
+    
+    .btn:last-child {
+        margin-bottom: 0 !important;
+    }
+    
+    .btn-group {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.75rem !important;
+    }
+    
+    .btn-group .btn {
+        width: 100% !important;
     }
     
     /* Invoice Form Mobile Spacing */
@@ -824,26 +849,38 @@ textarea.form-control {
     
     /* Invoice View Actions - Mobile */
     .invoice-actions {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        width: 100%;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 1rem !important;
+        width: 100% !important;
+        margin-top: 1rem !important;
     }
     
     .invoice-actions .btn {
-        width: 100%;
-        margin: 0;
+        width: 100% !important;
+        margin: 0 !important;
+        margin-bottom: 0.75rem !important;
+    }
+    
+    .invoice-actions .btn:last-child {
+        margin-bottom: 0 !important;
     }
     
     /* Form Actions - Mobile */
     .form-actions {
-        flex-direction: column;
-        gap: 0.75rem;
+        flex-direction: column !important;
+        gap: 1rem !important;
+        margin-top: 2rem !important;
     }
     
     .form-actions .btn {
-        width: 100%;
-        margin: 0;
+        width: 100% !important;
+        margin: 0 !important;
+        margin-bottom: 0.75rem !important;
+    }
+    
+    .form-actions .btn:last-child {
+        margin-bottom: 0 !important;
     }
 }
 
