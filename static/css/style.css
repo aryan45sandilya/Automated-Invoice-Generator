@@ -686,7 +686,7 @@ textarea.form-control {
     .main-content {
         margin-left: 0;
         padding: 1rem;
-        padding-top: 6rem;
+        padding-top: 80px !important;
     }
     
     .mobile-header {
@@ -697,7 +697,7 @@ textarea.form-control {
         top: 0;
         left: 0;
         right: 0;
-        height: 60px;
+        height: 56px;
         background: var(--bg-card);
         padding: 0 1rem;
         z-index: 1500;
@@ -707,7 +707,7 @@ textarea.form-control {
     
     .mobile-header h1 {
         color: var(--text-primary);
-        font-size: 1.25rem;
+        font-size: 1.125rem;
         margin: 0;
         font-weight: 700;
     }
@@ -784,6 +784,7 @@ textarea.form-control {
     
     .page-header {
         margin-bottom: 1.5rem;
+        margin-top: 1rem;
     }
     
     .btn {
@@ -799,15 +800,15 @@ textarea.form-control {
     
     .main-content {
         padding: 0.875rem;
-        padding-top: 5.5rem;
+        padding-top: 72px !important;
     }
     
     .mobile-header {
-        height: 56px;
+        height: 52px;
     }
     
     .mobile-header h1 {
-        font-size: 1.125rem;
+        font-size: 1rem;
     }
     
     h1 {
@@ -844,6 +845,7 @@ textarea.form-control {
     
     .page-header {
         margin-bottom: 1rem;
+        margin-top: 0.5rem;
     }
 }
 
