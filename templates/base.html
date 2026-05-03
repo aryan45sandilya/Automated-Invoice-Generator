@@ -121,10 +121,23 @@
 </head>
 <body>
     {% if current_user.is_authenticated %}
+    <!-- Mobile Header with Hamburger -->
+    <div class="mobile-header">
+        <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <h1>InvoiceHub</h1>
+    </div>
+    
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <div class="col-md-2 sidebar p-0">
+            <div class="col-md-2 sidebar p-0" id="sidebar">
                 <div class="sidebar-header">
                     <h2>
                         <i class="bi bi-receipt-cutoff"></i>

@@ -793,17 +793,93 @@ select.form-control {
 
 @media (max-width: 768px) {
     .sidebar {
-        transform: translateX(-100%);
-        width: 260px;
+        position: fixed;
+        left: -280px;
+        width: 280px;
+        transition: left 0.3s ease;
+        z-index: 2000;
     }
     
     .sidebar.active {
-        transform: translateX(0);
+        left: 0;
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
     }
     
     .main-content {
         margin-left: 0;
         padding: 1.25rem;
+        padding-top: 4rem;
+    }
+    
+    .mobile-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 0 1rem;
+        z-index: 1500;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .mobile-header h1 {
+        color: white;
+        font-size: 1.25rem;
+        margin: 0;
+        font-weight: 700;
+    }
+    
+    .hamburger {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        width: 30px;
+        height: 25px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        z-index: 2001;
+    }
+    
+    .hamburger span {
+        width: 30px;
+        height: 3px;
+        background: white;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        transform-origin: center;
+    }
+    
+    .hamburger.active span:nth-child(1) {
+        transform: rotate(45deg) translate(8px, 8px);
+    }
+    
+    .hamburger.active span:nth-child(2) {
+        opacity: 0;
+    }
+    
+    .hamburger.active span:nth-child(3) {
+        transform: rotate(-45deg) translate(7px, -7px);
+    }
+    
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1999;
+    }
+    
+    .sidebar-overlay.active {
+        display: block;
     }
     
     h1 {
@@ -843,6 +919,11 @@ select.form-control {
     
     .main-content {
         padding: 1rem;
+        padding-top: 4rem;
+    }
+    
+    .mobile-header h1 {
+        font-size: 1.125rem;
     }
     
     h1 {
@@ -874,6 +955,21 @@ select.form-control {
     
     .login-card {
         padding: 1.5rem;
+    }
+}
+
+/* Desktop - Hide mobile elements */
+@media (min-width: 769px) {
+    .mobile-header {
+        display: none;
+    }
+    
+    .hamburger {
+        display: none;
+    }
+    
+    .sidebar-overlay {
+        display: none !important;
     }
 }
 
