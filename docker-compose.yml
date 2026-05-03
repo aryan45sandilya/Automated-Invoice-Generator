@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - DATABASE_URL=postgresql://invoice_user:invoice_pass@db:5432/invoice_db
+      - SECRET_KEY=change-this-to-a-random-secret-key
+    depends_on:
+      - db
+    volumes:
+      - ./static:/app/static
+      - ./database:/app/database
+    restart: unless-stopped
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=invoice_user
+      - POSTGRES_PASSWORD=invoice_pass
+      - POSTGRES_DB=invoice_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
