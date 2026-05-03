@@ -686,7 +686,7 @@ textarea.form-control {
     .main-content {
         margin-left: 0;
         padding: 1rem;
-        padding-top: 5rem;
+        padding-top: 6rem;
     }
     
     .mobile-header {
@@ -697,7 +697,7 @@ textarea.form-control {
         top: 0;
         left: 0;
         right: 0;
-        height: 64px;
+        height: 60px;
         background: var(--bg-card);
         padding: 0 1rem;
         z-index: 1500;
@@ -781,6 +781,15 @@ textarea.form-control {
     .login-card {
         padding: 2rem;
     }
+    
+    .page-header {
+        margin-bottom: 1.5rem;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 @media (max-width: 480px) {
@@ -790,7 +799,7 @@ textarea.form-control {
     
     .main-content {
         padding: 0.875rem;
-        padding-top: 5rem;
+        padding-top: 5.5rem;
     }
     
     .mobile-header {
@@ -812,6 +821,7 @@ textarea.form-control {
     .btn {
         padding: 0.5rem 1rem;
         font-size: 0.875rem;
+        width: 100%;
     }
     
     .stats-value {
@@ -830,6 +840,10 @@ textarea.form-control {
     
     .login-card {
         padding: 1.5rem;
+    }
+    
+    .page-header {
+        margin-bottom: 1rem;
     }
 }
 
