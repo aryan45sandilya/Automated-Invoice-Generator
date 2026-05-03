@@ -16,8 +16,8 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Custom CSS with cache busting -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ range(1, 999999) | random }}">
     
     <style>
         :root {
@@ -224,8 +224,8 @@
     <!-- jQuery (optional, for easier DOM manipulation) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
-    <!-- Custom JS -->
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <!-- Custom JS with cache busting -->
+    <script src="{{ url_for('static', filename='js/main.js') }}?v={{ range(1, 999999) | random }}"></script>
     
     {% block extra_js %}{% endblock %}
 </body>
